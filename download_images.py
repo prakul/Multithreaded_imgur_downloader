@@ -6,6 +6,8 @@ import Queue
 import threading
 from functools import partial
 from multiprocessing.pool import Pool
+from redis import Redis
+from rq import Queue as rq
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -63,6 +65,16 @@ def multi_process_execution(pool_size=8):
     p = Pool(pool_size)
     p.map(download, links)
     logging.info('Time Taken to Multiprocess download %s images took %s Seconds', count, time() - start_time)
+
+
+def queue_backed_execution():
+    start_time = time()
+    download_dir = setup_download_dir()
+    links = get_links(CLIENT_ID)
+    count = len(links)
+    q = rq(connection=Redis(host='localhost', port=6379))
+    for link in links:
+        q.enqueue(download_link, download_dir, link)
 
 
 if __name__ == '__main__':
