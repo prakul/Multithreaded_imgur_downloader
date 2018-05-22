@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 from config import DOWNLOAD_URL, IMG_TYPES
+from time import time
 try:
     from urllib.request import Request, urlopen
 except ImportError:
@@ -29,7 +30,7 @@ def download_link(directory, link):
 
 
 def setup_download_dir():
-    download_dir = Path('images')
+    download_dir = Path('images_{0}'.format(str(time())))
     if not download_dir.exists():
         download_dir.mkdir()
     return download_dir
